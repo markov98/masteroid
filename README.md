@@ -1,2 +1,2 @@
 # masteroid
-A asteroid-style game.
+An asteroid-style game.
