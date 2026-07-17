@@ -1,23 +1,65 @@
 import './style.css';
 import { state } from './state.js';
 import { setupInput } from './input.js';
-import { createCanvas, clearScene } from './renderer.js';
-import { drawPlayer, updatePlayer } from './player.js';
-import { drawAsteroid, spawnAsteroids, updateAsteroids } from './asteroid.js';
+import { createCanvas, clearScene, drawBackground } from './renderer.js';
+import { drawBullets, drawPlayer, shootPlayer, updateBullets, updatePlayer } from './player.js';
+import { drawAsteroid, handleCollisions, spawnAsteroids, updateAsteroids } from './asteroid.js';
 
 const canvas = createCanvas(state);
 const ctx = canvas.getContext('2d');
 let lastTime = 0;
 
+function resetGame() {
+  state.player.x = 400;
+  state.player.y = 300;
+  state.player.speed = 0;
+  state.player.angle = -Math.PI / 2;
+  state.player.alive = true;
+  state.player.cooldown = 0;
+  state.asteroids = [];
+  state.bullets = [];
+  state.game.score = 0;
+  state.game.lives = 3;
+  state.game.over = false;
+  spawnAsteroids(state, canvas);
+}
+
 function update(dt) {
+  if (state.game.over) return;
+
   updatePlayer(state, dt, canvas);
   updateAsteroids(state, dt, canvas);
+  updateBullets(state, dt, canvas);
+  handleCollisions(state);
+
+  if (state.keys.Space) {
+    shootPlayer(state);
+  }
 }
 
 function drawScene() {
   clearScene(ctx, canvas);
+  drawBackground(ctx, canvas);
   state.asteroids.forEach((asteroid) => drawAsteroid(ctx, asteroid));
+  drawBullets(ctx, state.bullets);
   drawPlayer(ctx, state.player, state.keys);
+
+  ctx.fillStyle = '#f9fafb';
+  ctx.font = '16px Arial';
+  ctx.fillText(`Score: ${state.game.score}`, 16, 24);
+  ctx.fillText(`Lives: ${state.game.lives}`, 16, 46);
+
+  if (state.game.over) {
+    ctx.fillStyle = 'rgba(2, 4, 10, 0.8)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#f9fafb';
+    ctx.font = '32px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Game Over', canvas.width / 2, canvas.height / 2 - 20);
+    ctx.font = '18px Arial';
+    ctx.fillText('Press Enter to Restart', canvas.width / 2, canvas.height / 2 + 16);
+    ctx.textAlign = 'left';
+  }
 }
 
 function gameLoop(timestamp) {
@@ -29,7 +71,14 @@ function gameLoop(timestamp) {
 }
 
 setupInput(state);
-spawnAsteroids(state, canvas);
+window.addEventListener('keydown', (event) => {
+  if (event.code === 'Enter' && state.game.over) {
+    event.preventDefault();
+    resetGame();
+  }
+});
+
+resetGame();
 requestAnimationFrame(gameLoop);
 
 export default state;

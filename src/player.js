@@ -3,6 +3,7 @@ const MIN_SPEED = -2.2;
 
 export function updatePlayer(state, dt, canvas) {
   const player = state.player;
+  player.cooldown = Math.max(0, player.cooldown - dt);
 
   if (state.keys.KeyA || state.keys.ArrowLeft) {
     player.angle -= player.rotationSpeed * dt * 60;
@@ -26,6 +27,22 @@ export function updatePlayer(state, dt, canvas) {
   wrapAround(player, canvas);
 }
 
+export function shootPlayer(state) {
+  const player = state.player;
+  if (player.cooldown > 0 || !player.alive) {
+    return;
+  }
+
+  player.cooldown = 0.25;
+  state.bullets.push({
+    x: player.x + Math.cos(player.angle) * 24,
+    y: player.y + Math.sin(player.angle) * 24,
+    vx: Math.cos(player.angle) * 7.5,
+    vy: Math.sin(player.angle) * 7.5,
+    life: 1.2,
+  });
+}
+
 function wrapAround(entity, canvas) {
   if (entity.x < -20) entity.x = canvas.width + 20;
   if (entity.x > canvas.width + 20) entity.x = -20;
@@ -34,6 +51,8 @@ function wrapAround(entity, canvas) {
 }
 
 export function drawPlayer(ctx, player, keys) {
+  if (!player.alive) return;
+
   ctx.save();
   ctx.translate(player.x, player.y);
   ctx.rotate(player.angle);
@@ -61,4 +80,24 @@ export function drawPlayer(ctx, player, keys) {
   }
 
   ctx.restore();
+}
+
+export function drawBullets(ctx, bullets) {
+  ctx.fillStyle = '#fef3c7';
+  bullets.forEach((bullet) => {
+    ctx.beginPath();
+    ctx.arc(bullet.x, bullet.y, 2, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+export function updateBullets(state, dt, canvas) {
+  state.bullets.forEach((bullet) => {
+    bullet.x += bullet.vx;
+    bullet.y += bullet.vy;
+    bullet.life -= dt;
+    wrapAround(bullet, canvas);
+  });
+
+  state.bullets = state.bullets.filter((bullet) => bullet.life > 0);
 }

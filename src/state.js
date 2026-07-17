@@ -8,6 +8,7 @@ export const state = {
     rotationSpeed: 0.08,
     thrust: 0.12,
     alive: true,
+    cooldown: 0,
   },
   asteroids: [],
   bullets: [],
@@ -28,6 +29,7 @@ export const state = {
     score: 0,
     lives: 3,
     over: false,
+    spawnTimer: 0,
   },
   effects: {
     particles: [],
