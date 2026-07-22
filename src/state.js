@@ -27,6 +27,8 @@ export const state = {
     width: 800,
     height: 600,
     score: 0,
+    asteroidsDestroyed: 0,
+    scoreMultiplier: 1,
     lives: 3,
     started: false,
     over: false,

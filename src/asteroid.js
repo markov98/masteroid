@@ -126,7 +126,10 @@ export function handleCollisions(state) {
         state.bullets.splice(j, 1);
         state.asteroids.splice(i, 1);
         splitAsteroid(state, asteroid);
-        state.game.score += asteroid.radius > 20 ? 100 : 50;
+        state.game.asteroidsDestroyed += 1;
+        state.game.scoreMultiplier = 1 + Math.floor(state.game.asteroidsDestroyed / 10);
+        const points = asteroid.radius > 20 ? 100 : 50;
+        state.game.score += points * state.game.scoreMultiplier;
         break;
       }
     }

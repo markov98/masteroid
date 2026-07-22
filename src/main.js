@@ -19,6 +19,8 @@ function resetGame() {
   state.asteroids = [];
   state.bullets = [];
   state.game.score = 0;
+  state.game.asteroidsDestroyed = 0;
+  state.game.scoreMultiplier = 1;
   state.game.lives = 3;
   state.game.started = true;
   state.game.over = false;
@@ -64,6 +66,7 @@ function drawScene() {
   ctx.font = '16px Arial';
   ctx.fillText(`Score: ${state.game.score}`, 16, 24);
   ctx.fillText(`Lives: ${state.game.lives}`, 16, 46);
+  ctx.fillText(`Multiplier: x${state.game.scoreMultiplier}`, 16, 68);
 
   if (state.game.over) {
     ctx.fillStyle = 'rgba(2, 4, 10, 0.8)';
