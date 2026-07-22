@@ -28,6 +28,7 @@ export const state = {
     height: 600,
     score: 0,
     lives: 3,
+    started: false,
     over: false,
     spawnTimer: 0,
   },

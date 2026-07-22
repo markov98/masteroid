@@ -20,12 +20,13 @@ function resetGame() {
   state.bullets = [];
   state.game.score = 0;
   state.game.lives = 3;
+  state.game.started = true;
   state.game.over = false;
   spawnAsteroids(state, canvas);
 }
 
 function update(dt) {
-  if (state.game.over) return;
+  if (!state.game.started || state.game.over) return;
 
   updatePlayer(state, dt, canvas);
   updateAsteroids(state, dt, canvas);
@@ -40,6 +41,21 @@ function update(dt) {
 function drawScene() {
   clearScene(ctx, canvas);
   drawBackground(ctx, canvas);
+
+  if (!state.game.started) {
+    ctx.fillStyle = '#f9fafb';
+    ctx.textAlign = 'center';
+    ctx.font = '48px Arial';
+    ctx.fillText('MASTEROID', canvas.width / 2, canvas.height / 2 - 40);
+    ctx.font = '20px Arial';
+    ctx.fillText('Press Enter to Start', canvas.width / 2, canvas.height / 2 + 20);
+    ctx.font = '15px Arial';
+    ctx.fillStyle = '#9ca3af';
+    ctx.fillText('WASD to move  |  Space to shoot', canvas.width / 2, canvas.height / 2 + 55);
+    ctx.textAlign = 'left';
+    return;
+  }
+
   state.asteroids.forEach((asteroid) => drawAsteroid(ctx, asteroid));
   drawBullets(ctx, state.bullets);
   drawPlayer(ctx, state.player, state.keys);
@@ -72,13 +88,12 @@ function gameLoop(timestamp) {
 
 setupInput(state);
 window.addEventListener('keydown', (event) => {
-  if (event.code === 'Enter' && state.game.over) {
+  if (event.code === 'Enter' && (!state.game.started || state.game.over)) {
     event.preventDefault();
     resetGame();
   }
 });
 
-resetGame();
 requestAnimationFrame(gameLoop);
 
 export default state;
